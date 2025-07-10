@@ -1,186 +1,75 @@
 import streamlit as st
 import textwrap
 from streamlit_ace import st_ace
+import importlib
+import os
+import sys
+
+# Setup path untuk folder soal
+current_dir = os.path.dirname(os.path.abspath(__file__))
+soal_dir = os.path.join(current_dir, "soal")
+if soal_dir not in sys.path:
+    sys.path.insert(0, soal_dir)
+
+# Import paket soal
+soal_paket = {}
+paket_names = []
+
+try:
+    # Cari semua file paket di folder soal
+    for filename in os.listdir(soal_dir):
+        if filename.startswith("paket") and filename.endswith(".py"):
+            paket_num = filename.replace("paket", "").replace(".py", "")
+            mod_name = f"paket{paket_num}"
+            
+            try:
+                mod = importlib.import_module(mod_name)
+                # Ambil variabel paketX (X adalah angka)
+                paket_var = getattr(mod, mod_name)
+                soal_paket[f"Paket {paket_num}"] = paket_var
+                paket_names.append(f"Paket {paket_num}")
+            except (ImportError, AttributeError) as e:
+                st.warning(f"Gagal mengimpor {mod_name}: {str(e)}")
+    
+    # Urutkan paket berdasarkan nomor
+    paket_names = sorted(paket_names, key=lambda x: int(x.split()[-1]))
+    
+    # Jika tidak ada paket yang ditemukan
+    if not paket_names:
+        raise ImportError("Tidak ada paket soal yang ditemukan di folder 'soal'")
+except Exception as e:
+    st.error(f"Error: {str(e)}")
+    st.stop()
+
+# Build all_questions list with added paket information
+all_questions = []
+for paket_name, questions in soal_paket.items():
+    for q in questions:
+        q_with_paket = q.copy()
+        q_with_paket["paket"] = paket_name
+        all_questions.append(q_with_paket)
 
 # Initialize session state
 if 'current_question' not in st.session_state:
     st.session_state.current_question = 0
-    st.session_state.user_codes = [""] * 30
-    st.session_state.answers_checked = [False] * 30
-    st.session_state.show_hint = [False] * 30
-    st.session_state.show_solution = [False] * 30
+    st.session_state.user_codes = [""] * len(all_questions)
+    st.session_state.answers_checked = [False] * len(all_questions)
+    st.session_state.show_hint = [False] * len(all_questions)
+    st.session_state.show_solution = [False] * len(all_questions)
 
-# Question database
-questions = [
-    {
-        "no": 1,
-        "question": "Buat fungsi bernama 'tambah' yang menerima dua angka dan mengembalikan hasil penjumlahannya.",
-        "function_name": "tambah",
-        "test_cases": [((1, 2), 3), ((0, 0), 0), ((-1, 5), 4)],
-        "hint": "Gunakan operator +",
-        "solution": "def tambah(a, b):\n    return a + b"
-    },
-    {
-        "no": 2,
-        "question": "Buat fungsi bernama 'kali' yang menerima dua angka dan mengembalikan hasil perkaliannya.",
-        "function_name": "kali",
-        "test_cases": [((3, 4), 12), ((0, 5), 0), ((-2, 3), -6)],
-        "hint": "Gunakan operator *",
-        "solution": "def kali(a, b):\n    return a * b"
-    },
-    {
-        "no": 3,
-        "question": "Buat fungsi bernama 'sapa' yang menerima nama (string) dan mengembalikan 'Halo, [nama]!'.",
-        "function_name": "sapa",
-        "test_cases": [("Aries", "Halo, Aries!"), ("Budi", "Halo, Budi!"), ("", "Halo, !")],
-        "hint": "Gunakan f-string atau concatenation",
-        "solution": "def sapa(nama):\n    return f'Halo, {nama}!'"
-    },
-    {
-        "no": 4,
-        "question": "Buat fungsi bernama 'ganjil_genap' yang menerima angka dan mengembalikan 'ganjil' atau 'genap'.",
-        "function_name": "ganjil_genap",
-        "test_cases": [(1, 'ganjil'), (2, 'genap'), (0, 'genap')],
-        "hint": "Gunakan modulus % 2",
-        "solution": "def ganjil_genap(angka):\n    return 'genap' if angka % 2 == 0 else 'ganjil'"
-    },
-    {
-        "no": 5,
-        "question": "Buat fungsi bernama 'panjang_string' yang menerima string dan mengembalikan panjangnya.",
-        "function_name": "panjang_string",
-        "test_cases": [("Hello", 5), ("", 0), ("Python", 6)],
-        "hint": "Gunakan fungsi len()",
-        "solution": "def panjang_string(s):\n    return len(s)"
-    },
-    {
-        "no": 6,
-        "question": "Buat fungsi bernama 'faktorial' yang menghitung faktorial dari sebuah bilangan bulat non-negatif.",
-        "function_name": "faktorial",
-        "test_cases": [(0, 1), (1, 1), (5, 120)],
-        "hint": "Gunakan rekursi atau loop",
-        "solution": "def faktorial(n):\n    if n == 0:\n        return 1\n    return n * faktorial(n-1)"
-    },
-    {
-        "no": 7,
-        "question": "Buat fungsi bernama 'reverse_string' yang membalikkan sebuah string.",
-        "function_name": "reverse_string",
-        "test_cases": [("hello", "olleh"), ("Python", "nohtyP"), ("", "")],
-        "hint": "Gunakan slicing [::-1]",
-        "solution": "def reverse_string(s):\n    return s[::-1]"
-    },
-    {
-        "no": 8,
-        "question": "Buat fungsi bernama 'maksimum' yang menerima tiga angka dan mengembalikan angka terbesar.",
-        "function_name": "maksimum",
-        "test_cases": [((1, 2, 3), 3), ((9, 5, 7), 9), ((-1, -5, -3), -1)],
-        "hint": "Gunakan fungsi max() atau if-else",
-        "solution": "def maksimum(a, b, c):\n    return max(a, b, c)"
-    },
-    {
-        "no": 9,
-        "question": "Buat fungsi bernama 'adalah_vokal' yang menerima satu huruf dan mengembalikan True jika huruf tersebut vokal.",
-        "function_name": "adalah_vokal",
-        "test_cases": [("a", True), ("b", False), ("U", True)],
-        "hint": "Gunakan operator in dan string 'aeiouAEIOU'",
-        "solution": "def adalah_vokal(huruf):\n    return huruf in 'aeiouAEIOU'"
-    },
-    {
-        "no": 10,
-        "question": "Buat fungsi bernama 'kuadrat_list' yang menerima list angka dan mengembalikan list kuadrat dari angka-angka tersebut.",
-        "function_name": "kuadrat_list",
-        "test_cases": [([1, 2, 3], [1, 4, 9]), ([], []), ([0, -2], [0, 4])],
-        "hint": "Gunakan list comprehension atau loop",
-        "solution": "def kuadrat_list(lst):\n    return [x**2 for x in lst]"
-    },
-    {
-        "no": 11,
-        "question": "Buat fungsi bernama 'is_positive' yang menerima satu angka dan mengembalikan True jika positif.",
-        "function_name": "is_positive",
-        "test_cases": [(5, True), (0, False), (-3, False)],
-        "hint": "Gunakan operator >",
-        "solution": "def is_positive(n):\n    return n > 0"
-    },
-    {
-        "no": 12,
-        "question": "Buat fungsi bernama 'pangkat' yang menerima dua angka (basis dan eksponen) dan mengembalikan hasil perpangkatannya.",
-        "function_name": "pangkat",
-        "test_cases": [((2, 3), 8), ((5, 0), 1), ((3, 1), 3)],
-        "hint": "Gunakan operator **",
-        "solution": "def pangkat(a, b):\n    return a ** b"
-    },
-    {
-        "no": 13,
-        "question": "Buat fungsi bernama 'jumlah_list' yang menerima list angka dan mengembalikan jumlah seluruh elemennya.",
-        "function_name": "jumlah_list",
-        "test_cases": [([1, 2, 3], 6), ([0], 0), ([], 0)],
-        "hint": "Gunakan fungsi sum()",
-        "solution": "def jumlah_list(lst):\n    return sum(lst)"
-    },
-    {
-        "no": 14,
-        "question": "Buat fungsi bernama 'is_palindrom' yang mengecek apakah string adalah palindrom (dibaca sama dari depan dan belakang).",
-        "function_name": "is_palindrom",
-        "test_cases": [("katak", True), ("python", False), ("", True)],
-        "hint": "Bandingkan string dengan versi yang dibalik",
-        "solution": "def is_palindrom(s):\n    return s == s[::-1]"
-    },
-    {
-        "no": 15,
-        "question": "Buat fungsi bernama 'konversi_menit' yang menerima total detik dan mengembalikan jumlah menit (bilangan bulat).",
-        "function_name": "konversi_menit",
-        "test_cases": [(60, 1), (125, 2), (59, 0)],
-        "hint": "Gunakan pembagian bulat //",
-        "solution": "def konversi_menit(detik):\n    return detik // 60"
-    },
-    {
-        "no": 16,
-        "question": "Buat fungsi bernama 'hitung_diskon' yang menerima harga dan persen diskon, lalu mengembalikan harga setelah diskon.",
-        "function_name": "hitung_diskon",
-        "test_cases": [((100000, 10), 90000), ((50000, 20), 40000), ((75000, 0), 75000)],
-        "hint": "Diskon = harga * persen / 100",
-        "solution": "def hitung_diskon(harga, diskon):\n    return int(harga - (harga * diskon / 100))"
-    },
-    {
-        "no": 17,
-        "question": "Buat fungsi bernama 'huruf_besar' yang mengubah string menjadi huruf kapital semua.",
-        "function_name": "huruf_besar",
-        "test_cases": [("halo", "HALO"), ("Python", "PYTHON"), ("", "")],
-        "hint": "Gunakan method .upper()",
-        "solution": "def huruf_besar(teks):\n    return teks.upper()"
-    },
-    {
-        "no": 18,
-        "question": "Buat fungsi bernama 'nilai_tertinggi' yang menerima list nilai dan mengembalikan nilai terbesar.",
-        "function_name": "nilai_tertinggi",
-        "test_cases": [([80, 90, 100], 100), ([50], 50), ([0, -1, -5], 0)],
-        "hint": "Gunakan fungsi max()",
-        "solution": "def nilai_tertinggi(nilai):\n    return max(nilai)"
-    },
-    {
-        "no": 19,
-        "question": "Buat fungsi bernama 'bilangan_prima' yang mengecek apakah sebuah angka adalah bilangan prima.",
-        "function_name": "bilangan_prima",
-        "test_cases": [(2, True), (4, False), (7, True)],
-        "hint": "Periksa pembagi dari 2 sampai akar n",
-        "solution": (
-            "def bilangan_prima(n):\n"
-            "    if n < 2:\n"
-            "        return False\n"
-            "    for i in range(2, int(n**0.5)+1):\n"
-            "        if n % i == 0:\n"
-            "            return False\n"
-            "    return True"
-        )
-    },
-    {
-        "no": 20,
-        "question": "Buat fungsi bernama 'jumlah_digit' yang menghitung jumlah semua digit dalam sebuah angka positif.",
-        "function_name": "jumlah_digit",
-        "test_cases": [(123, 6), (0, 0), (4567, 22)],
-        "hint": "Ubah angka ke string, lalu iterasi tiap digit",
-        "solution": "def jumlah_digit(n):\n    return sum(int(d) for d in str(n))"
-    }
-]
+# Group questions by paket and tipe
+grouped_questions = {}
+for paket in paket_names:
+    grouped_questions[paket] = {}
+    # Get questions for this paket
+    paket_questions = [q for q in all_questions if q["paket"] == paket]
+    # Group by tipe
+    tipe_names = set(q["tipe"] for q in paket_questions)
+    
+    for tipe in tipe_names:
+        grouped_questions[paket][tipe] = [
+            q for q in paket_questions if q["tipe"] == tipe
+        ]
 
 # Function to run tests
 def run_tests(user_code, function_name, test_cases):
@@ -209,91 +98,163 @@ st.title("Python Function Practice")
 st.caption(f"🧩 Beginner Python Function Challenges")
 
 # Sidebar with question navigation
+# ... (kode sebelumnya tetap sama)
+
+# Sidebar with question navigation
 with st.sidebar:
-    st.header("Soal")
+    st.header("Navigasi Soal")
     
-    # Display question buttons in 2 columns
-    col1, col2 = st.columns(2)
+    # Package selection dropdown
+    selected_paket = st.selectbox(
+        "Pilih Paket Soal",
+        options=paket_names,
+        index=0
+    )
     
-    for i in range(len(questions)):
-        status = "✅" if st.session_state.answers_checked[i] else "❌" if st.session_state.user_codes[i] else str(i+1)
+    # Filter tipe soal
+    tipe_options = ["All", "Basic", "Logic Control", "Looping", "Campuran"]
+    selected_tipe = st.selectbox(
+        "Filter Tipe Soal",
+        options=tipe_options,
+        index=0
+    )
+    
+    # Dapatkan soal untuk paket yang dipilih
+    if selected_paket in grouped_questions:
+        # Kumpulkan semua soal dalam paket
+        all_paket_questions = []
+        for tipe in grouped_questions[selected_paket]:
+            all_paket_questions.extend(grouped_questions[selected_paket][tipe])
         
-        if i % 2 == 0:
-            if col1.button(f"{status}", key=f"q_{i}", use_container_width=True):
-                st.session_state.current_question = i
+        # Filter berdasarkan tipe yang dipilih
+        if selected_tipe != "All":
+            filtered_questions = [q for q in all_paket_questions if q["tipe"] == selected_tipe]
         else:
-            if col2.button(f"{status}", key=f"q_{i}", use_container_width=True):
-                st.session_state.current_question = i
-    
+            filtered_questions = all_paket_questions
+        
+        # Urutkan soal berdasarkan nomor JSON
+        sorted_questions = sorted(filtered_questions, key=lambda q: q["no"])
+        
+        # Tampilkan jumlah soal yang difilter
+        st.caption(f"Menampilkan {len(sorted_questions)} soal")
+        
+        # Buat grid 2 kolom untuk tombol soal
+        cols = st.columns(2)
+        for i, q in enumerate(sorted_questions):
+            # Find global index of this question
+            global_idx = next(i for i, q_global in enumerate(all_questions) 
+                      if q_global["no"] == q["no"] and q_global["paket"] == q["paket"])
+            
+            # Tentukan status tombol
+            if st.session_state.answers_checked[global_idx]:
+                status_icon = "✅"
+            elif st.session_state.user_codes[global_idx].strip():
+                status_icon = "❌"
+            else:
+                status_icon = ""
+            
+            with cols[i % 2]:
+                if st.button(
+                    f"{status_icon}{q['no']}",
+                    key=f"nav_{q['paket']}_{q['no']}",
+                    use_container_width=True,
+                ):
+                    st.session_state.current_question = global_idx
+                    st.rerun()
     # Sidebar footer
-    st.markdown("---")
-    st.caption("designed by Aries")
+    # CSS untuk menaruh footer sidebar di bawah
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"]::after {
+        content: "Designed by Aries";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        background-color: #F0F2F6;
+        font-size: 0.8rem;
+        color: #333;
+        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # Display current question
-q = questions[st.session_state.current_question]
-st.subheader(f"Soal {q['no']}")
-st.write(q['question'])
+if all_questions:
+    q = all_questions[st.session_state.current_question]
+    st.subheader(f"Soal {q['no']} - {q['tipe']} ({q['paket']})")
+    st.write(q['question'])
 
-# Enhanced code editor with syntax highlighting
-st.write("**Kode Anda:**")
-user_code = st_ace(
-    value=st.session_state.user_codes[st.session_state.current_question],
-    language="python",
-    theme="chrome",
-    key=f"editor_{st.session_state.current_question}",
-    height=200,
-    font_size=14,
-    auto_update=True
-)
-st.session_state.user_codes[st.session_state.current_question] = user_code
+    # Enhanced code editor with syntax highlighting
+    st.write("**Kode Anda:**")
+    user_code = st_ace(
+        value=st.session_state.user_codes[st.session_state.current_question],
+        language="python",
+        theme="chrome",
+        key=f"editor_{st.session_state.current_question}",
+        height=200,
+        font_size=14,
+        auto_update=True
+    )
+    st.session_state.user_codes[st.session_state.current_question] = user_code
 
-# Action buttons
-col1, col2, col3 = st.columns(3)
+    # Action buttons
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    check_btn = st.button("🚀 Periksa Jawaban", use_container_width=True)
+    with col1:
+        check_btn = st.button("🚀 Periksa Jawaban", use_container_width=True)
 
-with col2:
-    hint_btn = st.button("💡 Tampilkan Hint", use_container_width=True)
+    with col2:
+        hint_btn = st.button("💡 Tampilkan Hint", use_container_width=True)
 
-with col3:
-    solution_btn = st.button("🛟 Tampilkan Solusi", use_container_width=True)
+    with col3:
+        solution_btn = st.button("🛟 Tampilkan Solusi", use_container_width=True)
 
-# Handle button actions
-if check_btn:
-    if user_code.strip() == "":
-        st.warning("Silakan tulis kode Anda terlebih dahulu!")
-    else:
-        results, error = run_tests(user_code, q['function_name'], q.get('test_cases', q.get('test_cases', [])))
-        
-        if error:
-            st.error(f"Error: {error}")
+    # Handle button actions
+    if check_btn:
+        if user_code.strip() == "":
+            st.warning("Silakan tulis kode Anda terlebih dahulu!")
         else:
-            st.session_state.answers_checked[st.session_state.current_question] = True
-            all_passed = all(passed for _, passed, _, _ in results)
+            results, error = run_tests(user_code, q['function_name'], q.get('test_cases', []))
             
-            if all_passed:
-                st.success("✅ Semua test case berhasil!")
+            if error:
+                st.error(f"Error: {error}")
             else:
-                st.error("❌ Beberapa test case gagal:")
-            
-            for i, (inputs, passed, output, expected) in enumerate(results):
-                status = "✅" if passed else "❌"
-                st.write(f"**Test case {i+1} {status}:** `{q['function_name']}{inputs}`")
-                st.code(f"Output Anda: {output}\nDiharapkan: {expected}")
-                st.divider()
+                st.session_state.answers_checked[st.session_state.current_question] = True
+                all_passed = all(passed for _, passed, _, _ in results)
+                
+                if all_passed:
+                    st.success("✅ Semua test case berhasil!")
+                    for i, (inputs, passed, output, expected) in enumerate(results):
+                        status = "✅" if passed else "❌"
+                        st.write(f"**Test case {i+1} {status}:** `{q['function_name']}{inputs}`")
+                        st.code(f"Output Anda: {output}\nDiharapkan: {expected}")
+                        st.divider()
+                else:
+                    st.error("❌ Beberapa test case gagal:")
+                    
+                    for i, (inputs, passed, output, expected) in enumerate(results):
+                        status = "✅" if passed else "❌"
+                        st.write(f"**Test case {i+1} {status}:** `{q['function_name']}{inputs}`")
+                        st.code(f"Output Anda: {output}\nDiharapkan: {expected}")
+                        st.divider()
 
-if hint_btn:
-    st.session_state.show_hint[st.session_state.current_question] = True
+    if hint_btn:
+        st.session_state.show_hint[st.session_state.current_question] = True
 
-if solution_btn:
-    st.session_state.show_solution[st.session_state.current_question] = True
+    if solution_btn:
+        st.session_state.show_solution[st.session_state.current_question] = True
 
-# Display hint
-if st.session_state.show_hint[st.session_state.current_question]:
-    st.info(f"**Hint:** {q['hint']}")
+    # Display hint
+    if st.session_state.show_hint[st.session_state.current_question]:
+        st.info(f"**Hint:** {q['hint']}")
 
-# Display solution
-if st.session_state.show_solution[st.session_state.current_question]:
-    st.warning("**Solusi:**")
-    st.code(textwrap.dedent(q['solution']))
+    # Display solution
+    if st.session_state.show_solution[st.session_state.current_question]:
+        st.warning("**Solusi:**")
+        st.code(textwrap.dedent(q['solution']))
+else:
+    st.warning("Tidak ada soal yang tersedia. Silakan tambahkan paket soal di folder 'soal'.")
