@@ -66,16 +66,40 @@ paket4 = [
         "solution": "def get_score(nilai, nama):\n    return nilai[nama]"
     },
     {
-        "no": 6,
-        "tipe": "Dictionary",
-        "question": "Buat fungsi bernama `highest_score` yang menerima dictionary nilai siswa (nama sebagai key, nilai sebagai value). Fungsi harus mengembalikan tuple (nama, nilai) dari siswa dengan nilai tertinggi.",
-        "function_name": "highest_score",
+    "no": 6,
+    "tipe": "Dictionary",
+    "question": "Buat fungsi bernama `count_students` yang menerima dictionary nilai siswa (nama sebagai key, nilai sebagai value). Fungsi harus mengembalikan jumlah siswa dalam dictionary tersebut.",
+    "function_name": "count_students",
+    "test_cases": [
+        (({'Andi': 85, 'Budi': 78, 'Siti': 92},), 3),
+        (({'Rina': 88, 'Tono': 70},), 2),
+        (({},), 0)
+    ],
+    "hint": "Gunakan fungsi bawaan len() untuk menghitung jumlah item dalam dictionary.",
+    "solution": "def count_students(scores):\n    return len(scores)"
+    },
+    {
+        "no": 7,
+        "tipe": "File Processing",
+        "question": "Buat fungsi bernama `count_lines` yang menerima nama file (string). Fungsi harus mengembalikan jumlah baris dalam file tersebut.",
+        "function_name": "count_lines",
         "test_cases": [
-            (({'Andi': 85, 'Budi': 78, 'Siti': 92},), ('Siti', 92)),
-            (({'Rina': 88, 'Tono': 70},), ('Rina', 88)),
-            (({'Ali': 50},), ('Ali', 50))
+            (("sample1.txt",), 3),   # isi file sample1.txt punya 3 baris
+            (("sample2.txt",), 0)    # isi file sample2.txt kosong
         ],
-        "hint": "Gunakan fungsi max() dengan parameter key=dictionary.get untuk mencari nama dengan nilai tertinggi.",
-        "solution": "def highest_score(scores):\n    nama = max(scores, key=scores.get)\n    return (nama, scores[nama])"
+        "hint": "Gunakan with open(filename, 'r') as f lalu iterasi setiap baris atau gunakan read().splitlines().",
+        "solution": "def count_lines(filename):\n    with open(filename, 'r') as f:\n        return len(f.read().splitlines())"
+    },
+    {
+        "no": 8,
+        "tipe": "File Processing",
+        "question": "Buat fungsi bernama `write_uppercase` yang menerima dua parameter: `input_file` dan `output_file`. Fungsi harus membaca isi `input_file`, mengubah semua huruf menjadi kapital, lalu menuliskannya ke `output_file`.",
+        "function_name": "write_uppercase",
+        "test_cases": [
+            (("input1.txt", "output1.txt"), None),  # cek manual apakah output1.txt berisi huruf kapital
+        ],
+        "hint": "Gunakan string.upper() untuk mengubah isi file menjadi huruf kapital, lalu tulis dengan mode 'w'.",
+        "solution": "def write_uppercase(input_file, output_file):\n    with open(input_file, 'r') as f:\n        data = f.read()\n    with open(output_file, 'w') as f:\n        f.write(data.upper())"
     }
+
 ]
