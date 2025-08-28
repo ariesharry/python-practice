@@ -72,7 +72,9 @@ for paket in paket_names:
         ]
 
 # Function to run tests
-def run_tests(user_code, function_name, test_cases):
+import matplotlib.pyplot as plt
+
+def run_tests(user_code, function_name, test_cases, tipe=None):
     try:
         exec(user_code, globals())
         func = globals().get(function_name)
@@ -85,13 +87,24 @@ def run_tests(user_code, function_name, test_cases):
             try:
                 if not isinstance(inputs, tuple):
                     inputs = (inputs,)
-                output = func(*inputs)
-                results.append((inputs, output == expected, output, expected))
+                
+                # kalau tipe Matplotlib, jalankan dan render fig
+                if tipe == "Matplotlib":
+                    plt.close("all")  # bersihkan plot lama
+                    output = func(*inputs)
+                    fig = plt.gcf()
+                    results.append((inputs, True, "Grafik ditampilkan", expected))
+                    # tampilkan grafik di Streamlit
+                    st.pyplot(fig)
+                else:
+                    output = func(*inputs)
+                    results.append((inputs, output == expected, output, expected))
             except Exception as e:
                 results.append((inputs, False, str(e), expected))
         return results, None
     except Exception as e:
         return None, str(e)
+
 
 # UI Components
 st.title("Python Function Practice")
@@ -218,7 +231,8 @@ if all_questions:
         if user_code.strip() == "":
             st.warning("Silakan tulis kode Anda terlebih dahulu!")
         else:
-            results, error = run_tests(user_code, q['function_name'], q.get('test_cases', []))
+            results, error = run_tests(user_code, q['function_name'], q.get('test_cases', []), q['tipe'])
+
             
             if error:
                 st.error(f"Error: {error}")
