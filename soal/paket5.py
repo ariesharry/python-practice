@@ -9,13 +9,13 @@ paket5 = [
             ((0, 3), [0, 1, 2, 3]),
             ((5, 5), [5])
         ],
-        "hint": "Gunakan numpy.arange(start, end+1). Jangan lupa convert ke list dengan .tolist().",
+        "hint": "Gunakan numpy.arange(start, end+1). Jangan lupa convert ke **LIST** dengan .tolist().",
         "solution": "import numpy as np\ndef create_array(start, end):\n    return np.arange(start, end+1).tolist()"
     },
     {
         "no": 2,
         "tipe": "NumPy",
-        "question": "Buat fungsi bernama `reshape_matrix` yang menerima sebuah list dengan 6 angka. Fungsi harus mengembalikan list 2D berbentuk 2 baris × 3 kolom.",
+        "question": "Buat fungsi bernama `reshape_matrix` yang menerima sebuah list dengan 6 angka. Fungsi harus mengembalikan **LIST** 2D berbentuk 2 baris × 3 kolom.",
         "function_name": "reshape_matrix",
         "test_cases": [
             (([1, 2, 3, 4, 5, 6],), [[1, 2, 3], [4, 5, 6]])
