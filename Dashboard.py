@@ -77,33 +77,45 @@ import matplotlib.pyplot as plt
 def run_tests(user_code, function_name, test_cases, tipe=None):
     try:
         exec(user_code, globals())
-        func = globals().get(function_name)
-        
-        if not func:
-            return None, "Function not defined"
-        
+        cls_or_func = globals().get(function_name)
+
+        if not cls_or_func:
+            return None, "Function or class not defined"
+
         results = []
         for inputs, expected in test_cases:
             try:
-                if not isinstance(inputs, tuple):
-                    inputs = (inputs,)
-                
-                # kalau tipe Matplotlib, jalankan dan render fig
-                if tipe == "Matplotlib":
-                    plt.close("all")  # bersihkan plot lama
-                    output = func(*inputs)
-                    fig = plt.gcf()
-                    results.append((inputs, True, "Grafik ditampilkan", expected))
-                    # tampilkan grafik di Streamlit
-                    st.pyplot(fig)
+                # OOP: cek apakah test case menyertakan method
+                if isinstance(inputs, tuple) and len(inputs) == 2 and isinstance(inputs[1], str):
+                    constructor_args, method_name = inputs
+                    if not isinstance(constructor_args, tuple):
+                        constructor_args = (constructor_args,)
+                    obj = cls_or_func(*constructor_args)
+                    output = getattr(obj, method_name)()
                 else:
-                    output = func(*inputs)
-                    results.append((inputs, output == expected, output, expected))
+                    # Fungsi biasa
+                    if not isinstance(inputs, tuple):
+                        inputs = (inputs,)
+                    # Matplotlib
+                    if tipe == "Matplotlib":
+                        plt.close("all")
+                        output = cls_or_func(*inputs)
+                        fig = plt.gcf()
+                        results.append((inputs, True, "Grafik ditampilkan", expected))
+                        st.pyplot(fig)
+                        continue
+                    else:
+                        output = cls_or_func(*inputs)
+
+                results.append((inputs, output == expected, output, expected))
+
             except Exception as e:
                 results.append((inputs, False, str(e), expected))
         return results, None
+
     except Exception as e:
         return None, str(e)
+
 
 
 # UI Components
