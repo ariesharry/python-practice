@@ -2,7 +2,7 @@ paket7 = [
     {
         "no": 1,
         "tipe": "Function Basics",
-        "question": "Buat fungsi bernama `greet` yang menerima sebuah nama dan mencetak 'Hello <nama>'.",
+        "question": "Buat fungsi bernama `greet` yang menerima satu input:\n- `name` (string), nama seseorang.\nFungsi harus mencetak 'Hello <name>'. Fungsi tidak mengembalikan nilai.",
         "function_name": "greet",
         "test_cases": [
             (("Angus",), None),
@@ -14,7 +14,7 @@ paket7 = [
     {
         "no": 2,
         "tipe": "Formatting",
-        "question": "Buat fungsi `print_coordinates` yang menerima dua float dan mencetak dalam format (x, y) dengan 1 digit desimal.",
+        "question": "Buat fungsi bernama `print_coordinates` yang menerima dua input:\n- `x_coord` (float), koordinat x.\n- `y_coord` (float), koordinat y.\nFungsi harus mencetak koordinat dalam format (x, y) dengan 1 digit desimal. Fungsi tidak mengembalikan nilai.",
         "function_name": "print_coordinates",
         "test_cases": [
             ((3.14159, 2.71828), None),
@@ -27,7 +27,7 @@ paket7 = [
     {
         "no": 3,
         "tipe": "Math Conversion",
-        "question": "Buat fungsi `to_kilometres` yang mengubah mil ke kilometer (1 mil = 1.60934 km).",
+        "question": "Buat fungsi bernama `to_kilometres` yang menerima satu input:\n- `miles` (float), jarak dalam mil.\nFungsi harus mengembalikan nilai float hasil konversi ke kilometer (1 mil = 1.60934 km).",
         "function_name": "to_kilometres",
         "test_cases": [
             ((2.0,), 3.21868),
@@ -39,7 +39,7 @@ paket7 = [
     {
         "no": 4,
         "tipe": "Math",
-        "question": "Buat fungsi `calculate_rectangle_area` untuk menghitung luas persegi panjang.",
+        "question": "Buat fungsi bernama `calculate_rectangle_area` yang menerima dua input:\n- `width` (int atau float), lebar persegi panjang.\n- `height` (int atau float), tinggi persegi panjang.\nFungsi harus mengembalikan nilai luas (float atau int) dari persegi panjang.",
         "function_name": "calculate_rectangle_area",
         "test_cases": [
             ((5, 3), 15),
@@ -52,7 +52,7 @@ paket7 = [
     {
         "no": 5,
         "tipe": "Loop & Formatting",
-        "question": "Buat fungsi `print_reciprocals` yang mencetak kebalikan (1/n) setiap angka dalam list dengan 4 digit desimal.",
+        "question": "Buat fungsi bernama `print_reciprocals` yang menerima satu input:\n- `nums` (list of int), daftar bilangan bulat.\nFungsi harus mencetak kebalikan (1/n) setiap angka dengan 4 digit desimal dalam format '1/n = hasil'. Fungsi tidak mengembalikan nilai.",
         "function_name": "print_reciprocals",
         "test_cases": [
             (([3, 5, 1],), None),
@@ -64,7 +64,7 @@ paket7 = [
     {
         "no": 6,
         "tipe": "Math Conversion",
-        "question": "Buat fungsi `convert_to_celsius` yang mengubah Fahrenheit ke Celsius dengan rumus (F - 32) * 5/9.",
+        "question": "Buat fungsi bernama `convert_to_celsius` yang menerima satu input:\n- `degrees_f` (float), suhu dalam Fahrenheit.\nFungsi harus mengembalikan suhu yang dikonversi ke Celsius menggunakan rumus (F - 32) * 5/9.",
         "function_name": "convert_to_celsius",
         "test_cases": [
             ((32.0,), 0.0),
@@ -77,7 +77,7 @@ paket7 = [
     {
         "no": 7,
         "tipe": "List & Math",
-        "question": "Buat fungsi `sum_products` yang menjumlahkan hasil perkalian elemen-elemen dua list dengan panjang sama.",
+        "question": "Buat fungsi bernama `sum_products` yang menerima dua input:\n- `nums1` (list of int/float).\n- `nums2` (list of int/float) dengan panjang sama.\nFungsi harus mengembalikan jumlah hasil perkalian elemen-elemen yang bersesuaian.",
         "function_name": "sum_products",
         "test_cases": [
             (([1.5, 10.0], [10.0, 2.0]), 35.0),
@@ -89,7 +89,7 @@ paket7 = [
     {
         "no": 8,
         "tipe": "Condition",
-        "question": "Buat fungsi `num_adult_tickets` yang menghitung jumlah tiket yang dibutuhkan untuk 2 kakek/nenek (gratis jika usia >= 65) + 1 untuk diri sendiri.",
+        "question": "Buat fungsi bernama `num_adult_tickets` yang menerima dua input:\n- `grandparent1_age` (int), usia kakek/nenek pertama.\n- `grandparent2_age` (int), usia kakek/nenek kedua.\nFungsi harus menghitung jumlah tiket yang dibutuhkan untuk 2 kakek/nenek (gratis jika usia >= 65) ditambah 1 tiket untuk diri sendiri. Fungsi mengembalikan total tiket (int).",
         "function_name": "num_adult_tickets",
         "test_cases": [
             ((63, 64), 3),
@@ -103,7 +103,7 @@ paket7 = [
     {
         "no": 9,
         "tipe": "List & Condition",
-        "question": "Buat fungsi `num_good_wines` yang menghitung jumlah wine dengan kualitas >= 7.",
+        "question": "Buat fungsi bernama `num_good_wines` yang menerima satu input:\n- `quality_values` (list of float), daftar nilai kualitas wine.\nFungsi harus mengembalikan jumlah wine dengan kualitas >= 7 (int).",
         "function_name": "num_good_wines",
         "test_cases": [
             (([7.5, 6.7, 7.0, 9.1, 6.9, 4.9],), 3),
@@ -115,7 +115,7 @@ paket7 = [
     {
         "no": 10,
         "tipe": "Nested List",
-        "question": "Buat fungsi `promote_marks_list` yang mengalikan setiap nilai ujian dalam list siswa dengan rate, hasil dibulatkan 1 desimal.",
+        "question": "Buat fungsi bernama `promote_marks_list` yang menerima dua input:\n- `student_marks_list` (list of list of int/float), daftar nilai siswa.\n- `rate` (float), faktor pengali.\nFungsi harus mengembalikan list baru dengan setiap nilai dikalikan rate, dibulatkan 1 desimal.",
         "function_name": "promote_marks_list",
         "test_cases": [
             (([[65, 70, 75], [80, 85, 90], [55, 60, 65]], 1.1), [[71.5, 77.0, 82.5], [88.0, 93.5, 99.0], [60.5, 66.0, 71.5]]),
@@ -128,7 +128,7 @@ paket7 = [
     {
         "no": 11,
         "tipe": "Loop & Math",
-        "question": "Buat fungsi `sum_of_squares` yang menghitung jumlah kuadrat dari 1 sampai n.",
+        "question": "Buat fungsi bernama `sum_of_squares` yang menerima satu input:\n- `n` (int), batas atas.\nFungsi harus mengembalikan jumlah kuadrat dari 1 sampai n (int).",
         "function_name": "sum_of_squares",
         "test_cases": [
             ((0,), 0),
@@ -141,7 +141,7 @@ paket7 = [
     {
         "no": 12,
         "tipe": "Condition",
-        "question": "Buat fungsi `is_positive` yang mengembalikan True jika angka > 0, jika tidak False.",
+        "question": "Buat fungsi bernama `is_positive` yang menerima satu input:\n- `num` (int atau float).\nFungsi harus mengembalikan True jika num > 0, selain itu False.",
         "function_name": "is_positive",
         "test_cases": [
             ((5,), True),
@@ -154,7 +154,7 @@ paket7 = [
     {
         "no": 13,
         "tipe": "Condition",
-        "question": "Buat fungsi `grade` yang menerima nilai 0-100 dan mengembalikan huruf A/B/C/D/F sesuai rentang.",
+        "question": "Buat fungsi bernama `grade` yang menerima satu input:\n- `score` (int), nilai ujian antara 0–100.\nFungsi harus mengembalikan string huruf A/B/C/D/F sesuai rentang skor.",
         "function_name": "grade",
         "test_cases": [
             ((95,), "A"),
@@ -167,7 +167,7 @@ paket7 = [
     {
         "no": 14,
         "tipe": "List",
-        "question": "Buat fungsi `repeat_elements` yang mengulang setiap elemen list sebanyak n kali.",
+        "question": "Buat fungsi bernama `repeat_elements` yang menerima dua input:\n- `lst` (list), daftar elemen.\n- `n` (int), jumlah pengulangan.\nFungsi harus mengembalikan list baru dengan setiap elemen diulang sebanyak n kali.",
         "function_name": "repeat_elements",
         "test_cases": [
             (([1, 2, 3], 2), [1, 1, 2, 2, 3, 3]),
@@ -180,7 +180,7 @@ paket7 = [
     {
         "no": 15,
         "tipe": "List & Condition",
-        "question": "Buat fungsi `get_element_at_index` yang mengambil elemen list sesuai index. Jika out of bounds, return None.",
+        "question": "Buat fungsi bernama `get_element_at_index` yang menerima dua input:\n- `lst` (list), daftar elemen.\n- `index` (int), posisi indeks.\nFungsi harus mengembalikan elemen pada posisi tersebut. Jika indeks di luar jangkauan, kembalikan None.",
         "function_name": "get_element_at_index",
         "test_cases": [
             (([1, 2, 3], 1), 2),
@@ -193,7 +193,7 @@ paket7 = [
     {
         "no": 16,
         "tipe": "List",
-        "question": "Buat fungsi `modify_list` yang memindahkan elemen terakhir ke depan list.",
+        "question": "Buat fungsi bernama `modify_list` yang menerima satu input:\n- `lst` (list), daftar elemen.\nFungsi harus mengembalikan list baru dengan elemen terakhir dipindahkan ke depan. Jika list kosong, kembalikan list kosong.",
         "function_name": "modify_list",
         "test_cases": [
             (([1, 2, 3],), [3, 1, 2]),
