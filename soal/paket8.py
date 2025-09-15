@@ -269,6 +269,41 @@ paket8 = [
         "test_cases": [],
         "hint": "Gunakan f-string dan cek kondisi can_fly.",
         "solution": "class Bird:\n    def __init__(self, kind, length, colour, can_fly):\n        self.kind = kind\n        self.length = length\n        self.colour = colour\n        self.can_fly = can_fly\n    def __str__(self):\n        fly_status = 'can fly' if self.can_fly else 'flightless'\n        return f\"{self.kind} ({self.length:.1f} cm), {self.colour}, {fly_status}\"\n    def __repr__(self):\n        return self.__str__()\n    def grow(self, amount):\n        self.length += amount"
+    },
+    {
+        "no": 23,
+        "tipe": "Matplotlib",
+        "question": "Buat fungsi bernama `plot_sales_bars` yang menerima satu input:\n- `filename` (string), nama file CSV berisi data penjualan mingguan.\nFile berisi beberapa baris, setiap baris mewakili 1 minggu dengan 5 angka (penjualan Senin–Jumat). Baris pertama adalah header dan harus diabaikan.\nFungsi harus membaca file, menghitung total penjualan mingguan, lalu membuat bar chart total penjualan per minggu. Atur label sumbu-x menjadi 'Week' (dimulai dari 1), sumbu-y menjadi 'Total Sales', dan judul grafik berisi nama file. Fungsi tidak mengembalikan nilai.",
+        "function_name": "plot_sales_bars",
+        "test_cases": [
+            (("sales1.csv",), None),
+            (("sales2.csv",), None)
+        ],
+        "hint": "Gunakan pandas.read_csv() untuk membaca file, abaikan baris pertama, jumlahkan per baris dengan sum(axis=1), lalu gunakan plt.bar().",
+        "solution": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndef plot_sales_bars(filename):\n    data = pd.read_csv(filename)\n    weekly_totals = data.sum(axis=1)\n    plt.bar(range(1, len(weekly_totals)+1), weekly_totals)\n    plt.xlabel('Week')\n    plt.ylabel('Total Sales')\n    plt.title(f'Weekly sales from file {filename}')\n    plt.show()"
+    },
+    {
+    "no": 24,
+    "tipe": "File Processing",
+    "question": "Buat fungsi bernama `print_daily_totals` yang menerima satu input:\n- `filename` (string), nama file teks berisi data sampel berat harian.\nSetiap baris file dimulai dengan format 'day month year', diikuti beberapa angka (float) mewakili berat pada hari tersebut.\nFungsi harus menghitung jumlah total berat per hari, lalu MENGEMBALIKAN list of string dengan format: 'YYYY-M-D = total' (3 desimal). Fungsi tidak mencetak nilai apapun.",
+    "function_name": "print_daily_totals",
+    "test_cases": [
+        (("data1.txt",), ["2024-1-1 = 6.600", "2024-1-2 = 5.000", "2024-1-3 = 7.500", "2024-1-4 = 5.000", "2024-1-5 = 9.000"]),
+        (("data2.txt",), ["2024-2-10 = 7.000", "2024-2-11 = 2.000", "2024-2-12 = 7.000", "2024-2-13 = 10.000", "2024-2-14 = 16.500", "2024-2-15 = 0.000"])
+    ],
+    "hint": "Pisahkan baris dengan split(), gunakan dictionary MONTHS untuk konversi bulan ke angka, jumlahkan angka-angka setelah tanggal, lalu return list of string dengan format yang benar.",
+    "solution": "MONTHS = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}\n\ndef print_daily_totals(filename):\n    results = []\n    with open(filename) as f:\n        lines = f.readlines()\n    for line in lines:\n        parts = line.strip().split(',')\n        date_parts = parts[0].split()\n        day, month, year = date_parts[0], date_parts[1], date_parts[2]\n        values = [float(x) for x in parts[1:]]\n        total = sum(values)\n        results.append(f\"{year}-{MONTHS[month]}-{int(day)} = {total:.3f}\")\n    return results"
+    },
+    {
+        "no": 25,
+        "tipe": "Matplotlib",
+        "question": "Buat fungsi bernama `plot_teenage_heights` yang menerima satu input:\n- `filename` (string), nama file CSV berisi data tinggi rata-rata anak usia 5–19 tahun.\nFungsi harus membaca file, memilih hanya data dengan usia >= 13, lalu membuat histogram tinggi rata-rata. Histogram harus menggunakan bin 2 satuan mulai dari 140–142 hingga 178–180, dengan label sumbu-x 'Average Height (cm)', label sumbu-y 'Count', dan judul grafik berisi nama file. X-ticks harus diatur setiap 4 cm. Fungsi tidak mengembalikan nilai.",
+        "function_name": "plot_teenage_heights",
+        "test_cases": [
+            (("Lancet_2020_height_child_adolescent.csv",), None)
+        ],
+        "hint": "Gunakan pandas untuk baca file, filter age >= 13, lalu gunakan plt.hist() dengan bins=range(140,182,2) dan plt.xticks(range(140,182,4)).",
+        "solution": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndef plot_teenage_heights(filename):\n    data = pd.read_csv(filename)\n    teen_data = data[data['Age'] >= 13]['Height']\n    plt.hist(teen_data, bins=range(140,182,2), edgecolor='black')\n    plt.xlabel('Average Height (cm)')\n    plt.ylabel('Count')\n    plt.title(f'Teenage Heights from {filename}')\n    plt.xticks(range(140,182,4))\n    plt.show()"
     }
     
 ]
